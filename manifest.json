@@ -1,0 +1,9 @@
+{
+  "namespace": "keybindsettings",
+  "name": "Keybind Settings",
+  "version": "1.0.3",
+  "description": "Customizable global keybindings with Ctrl and Alt support for all DLCs.",
+  "author": "Vacic",
+  "engineVersion": ">=1.0.0",
+  "setup": "setup.mjs"
+}
