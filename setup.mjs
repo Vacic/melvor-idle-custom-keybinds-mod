@@ -5,14 +5,14 @@ export async function setup(ctx) {
     getModConfig,
     handleKeyDown,
     loadKeybinds,
+    availablePages,
     removeAllBinds,
     restoreDefaultBinds,
   } = await helpers(ctx)
-  const { ALL_PAGES } = await ctx.loadModule('constants.mjs')
 
   // Creates UI and assigns default keybinds
   const sectionMap = {}
-  ALL_PAGES.forEach((page, i) => {
+  availablePages.forEach((page, i) => {
     if (!sectionMap[page.section]) sectionMap[page.section] = ctx.settings.section(page.section)
 
     if (!i) {

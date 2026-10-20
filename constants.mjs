@@ -40,12 +40,14 @@ export const ALL_PAGES = [
     name: "View Skill Trees (ItA)",
     defaultKey: "e",
     section: "Into the Abyss",
+    requiresExpansion: "melvorItA",
   },
   {
     id: ABYSSAL_REALM_ID,
     name: "Abyssal Realm (ItA)",
     defaultKey: "r",
     section: "Into the Abyss",
+    requiresExpansion: "melvorItA",
   },
   {
     id: "melvorD:Combat",
@@ -58,6 +60,7 @@ export const ALL_PAGES = [
     name: "Corruption (ItA)",
     defaultKey: "s",
     section: "Combat",
+    requiresExpansion: "melvorItA",
   },
   {
     id: "melvorD:Farming",

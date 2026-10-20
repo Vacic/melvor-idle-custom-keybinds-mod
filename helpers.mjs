@@ -1,10 +1,18 @@
 export const helpers = async (ctx) => {
   const { ACCOUNT_STORAGE_KEY, CUSTOM_ID_TO_PAGE_MAPPING, ALL_PAGES } =
     await ctx.loadModule('constants.mjs')
+  const expansionEntitlements = {
+    melvorAoD: cloudManager.hasAoDEntitlementAndIsEnabled,
+    melvorItA: cloudManager.hasItAEntitlementAndIsEnabled,
+  }
+  const availablePages = ALL_PAGES.filter((page) => {
+    const expansion = page.requiresExpansion || page.id.split(':')[0]
+    return expansionEntitlements[expansion] ?? true
+  })
 
   const getAccountStorageDefaultKeybinds = () => {
     const defaultKeybinds = {}
-    for (const page of ALL_PAGES) {
+    for (const page of availablePages) {
       defaultKeybinds[page.id] = {
         key: page.defaultKey?.toUpperCase() || '',
         mod: page.defaultMod || '',
@@ -21,9 +29,11 @@ export const helpers = async (ctx) => {
     if (!keybinds)
       return ctx.accountStorage.setItem(ACCOUNT_STORAGE_KEY, getAccountStorageDefaultKeybinds())
 
-    for (const id in keybinds) {
-      sectionMap[keybinds[id].section].set(`${id}_key`, keybinds[id].key.toUpperCase())
-      sectionMap[keybinds[id].section].set(`${id}_mod`, keybinds[id].mod)
+    const defaultKeybinds = getAccountStorageDefaultKeybinds()
+    for (const page of availablePages) {
+      const keybind = keybinds[page.id] || defaultKeybinds[page.id]
+      sectionMap[page.section].set(`${page.id}_key`, keybind.key.toUpperCase())
+      sectionMap[page.section].set(`${page.id}_mod`, keybind.mod)
     }
   }
 
@@ -50,7 +60,7 @@ export const helpers = async (ctx) => {
     }
 
     const pressedKey = e.key ? e.key.toLowerCase() : ''
-    for (const page of ALL_PAGES) {
+    for (const page of availablePages) {
       const targetKeySetting = sectionMap[page.section].get(`${page.id}_key`)
       const targetModSetting = sectionMap[page.section].get(`${page.id}_mod`)
 
@@ -119,7 +129,7 @@ export const helpers = async (ctx) => {
 
   // Gets picked up by handleOnChange and clears all keybinds from ctx.accountStorage
   const removeAllBinds = (sectionMap) => {
-    for (const page of ALL_PAGES) {
+    for (const page of availablePages) {
       sectionMap[page.section].set(`${page.id}_key`, '')
       sectionMap[page.section].set(`${page.id}_mod`, '')
     }
@@ -127,7 +137,7 @@ export const helpers = async (ctx) => {
 
   // Gets picked up by handleOnChange and restores default keybinds in ctx.accountStorage
   const restoreDefaultBinds = (sectionMap) => {
-    for (const page of ALL_PAGES) {
+    for (const page of availablePages) {
       sectionMap[page.section].set(`${page.id}_mod`, page.defaultMod || '')
       sectionMap[page.section].set(`${page.id}_key`, page.defaultKey?.toUpperCase() || '')
     }
@@ -140,6 +150,7 @@ export const helpers = async (ctx) => {
     handleOnChange,
     getModConfig,
     getKeyConfig,
+    availablePages,
     removeAllBinds,
     restoreDefaultBinds,
   }
